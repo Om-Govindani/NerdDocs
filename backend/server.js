@@ -3,18 +3,26 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 dotenv.config();
 import cors from "cors";
+import cookieParser from "cookie-parser";
 
 import authRoutes from "./routes/auth.js";
 
-
-
 const app = express();
-app.use(express.json());
-app.use(cors());
 
-mongoose.connect(process.env.MONGO_URI)
+app.use(express.json());
+app.use(cookieParser());
+
+app.use(
+  cors({
+    origin: "http://localhost:5174", // yahan apna frontend origin
+    credentials: true,
+  })
+);
+
+mongoose
+  .connect(process.env.MONGO_URI)
   .then(() => console.log("MongoDB Connected"))
-  .catch(err => console.log(err));
+  .catch((err) => console.log(err));
 
 app.use("/auth", authRoutes);
 
