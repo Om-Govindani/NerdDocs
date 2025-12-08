@@ -7,9 +7,9 @@ function Navbar({ theme, setTheme }) {
 
   return (
     <div
-      className="navbar fixed top-0 z-50 bg-transparent drop-shadow-3xl w-full h-20
+      className="navbar fixed top-0 z-50 bg-transparent drop-shadow-3xl w-full h-16
                  flex items-center justify-between px-6"
-      style={{ backdropFilter: "blur(4px)" }}
+      style={{ backdropFilter: "blur(8px)" }}
     >
       {/* Logo */}
       <div className="flex items-center gap-3 cursor-pointer" onClick={()=>navigate('/')}>

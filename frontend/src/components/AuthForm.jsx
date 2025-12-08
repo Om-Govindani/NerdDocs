@@ -19,8 +19,8 @@ function AuthForm() {
 
   // Theme classes
   const themeClasses = {
-    bg: isDark ? "bg-slate-950 text-white" : "bg-orange-100 text-slate-900",
-    card: isDark ? "bg-slate-800 shadow-xl" : "bg-white shadow-lg",
+    bg: isDark ? "bg-slate-950 text-white" : "bg-orange-50 text-slate-900",
+    card: isDark ? "bg-slate-800 shadow-xl" : "bg-white shadow-2xl",
     input: isDark
       ? "bg-slate-700 text-white border-slate-600"
       : "bg-white border-slate-300",

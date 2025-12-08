@@ -14,7 +14,7 @@ app.use(cookieParser());
 
 app.use(
   cors({
-    origin: "http://localhost:5174", // yahan apna frontend origin
+    origin: "http://localhost:5173", // yahan apna frontend origin
     credentials: true,
   })
 );

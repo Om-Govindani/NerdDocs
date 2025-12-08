@@ -7,6 +7,7 @@ import Profile from "./pages/Profile";
 import ThemeContext from "./context/ThemeContext";
 import CatagoryContext from "./context/CatagoryContext";
 import AuthContext from "./context/AuthContext";
+import CourseDetails from "./pages/CourseDetails";
 
 function App() {
   const [theme, setTheme] = useState("light");
@@ -42,6 +43,7 @@ function App() {
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/profile" element={<Profile />} />
+              <Route path="/course/:id" element={<CourseDetails />} />
             </Routes>
           </BrowserRouter>
         </AuthContext.Provider>
