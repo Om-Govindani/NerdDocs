@@ -1,17 +1,17 @@
+// models/User.js
 import mongoose from "mongoose";
 
-const myCourseSchema = new mongoose.Schema({
-  courseName   : { type: String, required: true },
-  dateOfBuying : { type: Date, required: true },
-  purchaseId   : { type: String, required: true },
-});
-
-const userSchema = new mongoose.Schema(
+const UserSchema = new mongoose.Schema(
   {
-    email           : { type: String, unique: true, required: true },
-    isEmailVerified : { type: Boolean, default: false },
-    myCourses       : { type: [myCourseSchema], default: [] },
+    user_id: { type: String, unique: true, required: true }, 
+    firstName: { type: String },
+    lastName: { type: String },
+    emailEncrypted: { type: String, required: true },
+    emailHash: { type: String, required: true, index: true },
+
+    isEmailVerified: { type: Boolean, default: false },
   },
   { timestamps: true }
 );
-export default mongoose.model("User", userSchema);
+
+export default mongoose.model("User", UserSchema);

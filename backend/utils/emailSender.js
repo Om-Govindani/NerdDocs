@@ -27,8 +27,3 @@ export async function sendEmailOtp(to, otp) {
     `,
   });
 }
-
-console.log("LOADED HOST:", process.env.EMAIL_HOST);
-console.log("LOADED PORT:", process.env.EMAIL_PORT);
-console.log("LOADED USER:", process.env.EMAIL_USER);
-console.log("LOADED PASS:", process.env.EMAIL_PASS);

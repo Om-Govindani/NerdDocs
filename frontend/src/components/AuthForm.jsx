@@ -9,24 +9,27 @@ function AuthForm() {
 
   const isDark = theme === "dark";
 
+  // Sign Up adds FULL NAME field
+  const [fullName, setFullName] = useState("");
+
   // UI States
   const [isSigningUp, setIsSigningUp] = useState(false);
   const [email, setEmail] = useState("");
   const [otpSent, setOtpSent] = useState(false);
   const [otp, setOtp] = useState("");
   const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false); // loading state
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Theme classes
+  // Theme classes (untouched)
   const themeClasses = {
     bg: isDark ? "bg-slate-950 text-white" : "bg-orange-50 text-slate-900",
-    card: isDark ? "bg-slate-800 shadow-xl" : "bg-white shadow-2xl",
+    card: isDark ? "bg-slate-800 shadow-2xl" : "bg-blue-100/60 shadow-2xl",
     input: isDark
       ? "bg-slate-700 text-white border-slate-600"
       : "bg-white border-slate-300",
     button:
-      "bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2 px-4 rounded transition duration-200",
-    link: "text-orange-500 hover:text-orange-600 cursor-pointer text-sm mt-3",
+      "bg-blue-500 hover:bg-blue-600/90 text-white font-semibold py-2 px-4 rounded transition duration-200",
+    link: "text-blue-500 hover:text-blue-600/90 cursor-pointer text-sm mt-3",
   };
 
   // ------------------------------------
@@ -42,16 +45,23 @@ function AuthForm() {
       return;
     }
 
+    // SIGNUP requires full name
+    if (isSigningUp && fullName.trim().length < 3) {
+      setError("Please enter your full name.");
+      return;
+    }
+
     setIsLoading(true);
 
     try {
-      const res = await fetch("http://localhost:5000/auth/request-otp", {
+      const res = await fetch("http://localhost:5000/api/auth/request-otp", {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email,
           purpose: isSigningUp ? "signup" : "login",
+          fullName: isSigningUp ? fullName : undefined, // SEND NAME ONLY FOR SIGNUP
         }),
       });
 
@@ -72,13 +82,14 @@ function AuthForm() {
     if (!otp || otp.length !== 6) return setError("Enter the 6-digit OTP");
 
     try {
-      const res = await fetch("http://localhost:5000/auth/verify-otp", {
+      const res = await fetch("http://localhost:5000/api/auth/verify-otp", {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email,
           otp,
+          fullName: isSigningUp ? fullName : undefined, // Backend needs name during signup
           purpose: isSigningUp ? "signup" : "login",
         }),
       });
@@ -86,13 +97,13 @@ function AuthForm() {
       const data = await res.json();
 
       if (data.success) {
-        // Backend has set cookies; just update React state
         setUser(data.user);
 
-        // Reset form
+        // RESET FIELDS
         setOtpSent(false);
         setOtp("");
         setEmail("");
+        setFullName("");
       } else {
         setError(data.error);
       }
@@ -100,33 +111,6 @@ function AuthForm() {
       setError("Server error. Try again.");
     }
   }
-
-  // ------------------------------------
-  //               UI HELPERS
-  // ------------------------------------
-
-  const LoadingSpinner = () => (
-    <svg
-      className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-    >
-      <circle
-        className="opacity-25"
-        cx="12"
-        cy="12"
-        r="10"
-        stroke="currentColor"
-        strokeWidth="4"
-      ></circle>
-      <path
-        className="opacity-75"
-        fill="currentColor"
-        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 0112 20a7.962 7.962 0 016-2.709L15 14l-3 3-2-2-4 4z"
-      ></path>
-    </svg>
-  );
 
   // ------------------------------------
   //               RENDER UI
@@ -138,9 +122,28 @@ function AuthForm() {
         {isSigningUp ? "Create Account" : "Welcome Back"}
       </h2>
 
-      {/* EMAIL → OTP STEP */}
+      {/* STEP 1: NAME + EMAIL → REQUEST OTP */}
       {!otpSent && (
         <form onSubmit={handleGetOTP} className="flex flex-col gap-4">
+
+          {/* FULL NAME FIELD ONLY IN SIGNUP */}
+          {isSigningUp && (
+            <div>
+              <label className="block text-sm font-medium mb-1">
+                Full Name
+              </label>
+              <input
+                type="text"
+                placeholder="John Doe"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                className={`w-full p-3 border rounded-md focus:ring-2 focus:ring-blue-500 outline-none ${themeClasses.input}`}
+                required
+              />
+            </div>
+          )}
+
+          {/* EMAIL FIELD */}
           <div>
             <label htmlFor="email" className="block text-sm font-medium mb-1">
               Email Address
@@ -151,7 +154,7 @@ function AuthForm() {
               placeholder="yourname@gmail.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className={`w-full p-3 border rounded-md focus:ring-2 focus:ring-orange-500 outline-none ${themeClasses.input}`}
+              className={`w-full p-3 border rounded-md focus:ring-2 focus:ring-blue-500 outline-none ${themeClasses.input}`}
               required
             />
           </div>
@@ -163,19 +166,12 @@ function AuthForm() {
             className={`${themeClasses.button} flex items-center justify-center`}
             disabled={isLoading}
           >
-            {isLoading ? (
-              <>
-                <LoadingSpinner />
-                Loading...
-              </>
-            ) : (
-              "Get OTP"
-            )}
+            {isLoading ? "Loading..." : "Get OTP"}
           </button>
         </form>
       )}
 
-      {/* OTP INPUT STEP */}
+      {/* STEP 2: OTP INPUT */}
       {otpSent && (
         <div className="flex flex-col gap-4">
           <p className="text-center mb-2">
@@ -192,12 +188,10 @@ function AuthForm() {
           <button onClick={handleVerifyOTP} className={themeClasses.button}>
             Verify OTP
           </button>
+
           <p className="text-center text-sm opacity-75">
             Wrong email?{" "}
-            <a
-              onClick={() => setOtpSent(false)}
-              className={themeClasses.link}
-            >
+            <a onClick={() => setOtpSent(false)} className={themeClasses.link}>
               Go Back
             </a>
           </p>

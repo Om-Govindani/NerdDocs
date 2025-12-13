@@ -38,7 +38,7 @@ export default function OtpInput ({ otp, setOtp, length = 6, themeClasses }) {
           // Using ref management like this for a short component is simplified:
           ref={(el) => (inputRefs[index] = el)} 
           className={`w-10 h-12 text-center text-xl font-mono border rounded-md caret-transparent 
-                      focus:ring-2 focus:ring-orange-500 outline-none ${themeClasses.input} 
+                      focus:ring-2 focus:ring-blue-500 outline-none ${themeClasses.input} 
                       ${themeClasses.bg === "bg-slate-950 text-white" ? "bg-slate-700" : "bg-white"}
                       text-white-caret`}
           style={{ 

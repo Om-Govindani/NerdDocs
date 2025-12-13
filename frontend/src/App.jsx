@@ -8,17 +8,18 @@ import ThemeContext from "./context/ThemeContext";
 import CatagoryContext from "./context/CatagoryContext";
 import AuthContext from "./context/AuthContext";
 import CourseDetails from "./pages/CourseDetails";
+import CourseReader from "./pages/CourseReader";
 
 function App() {
   const [theme, setTheme] = useState("light");
-  const [catagory, setCatagory] = useState("C Programming");
+  const [catagory, setCatagory] = useState("Programming Language");
   const [user, setUser] = useState(null);
 
   // On app load, check if user is already logged in (via cookies)
   useEffect(() => {
     async function fetchUser() {
       try {
-        const res = await fetch("http://localhost:5000/auth/me", {
+        const res = await fetch("http://localhost:5000/api/auth/me", {
           method: "GET",
           credentials: "include", // IMPORTANT for cookies
         });
@@ -44,6 +45,7 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/course/:id" element={<CourseDetails />} />
+              <Route path="/reader" element={<CourseReader />} />
             </Routes>
           </BrowserRouter>
         </AuthContext.Provider>

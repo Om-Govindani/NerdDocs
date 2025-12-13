@@ -1,14 +1,13 @@
-import jwt from "jsonwebtoken";
+import { verifyAccess } from "../utils/token.js";
 
 export default function auth(req, res, next) {
-  const token = req.cookies.accessToken;
-  if (!token) return res.status(401).json({ error: "Not authenticated" });
-
   try {
-    const data = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = data;
-    next();
+    const token = req.cookies?.accessToken;
+    if (!token) return res.status(401).json({ error: "Unauthorized" });
+    const data = verifyAccess(token);
+    req.user = { userId: data.userId };
+    return next();
   } catch (err) {
-    return res.status(401).json({ error: "Token expired" });
+    return res.status(401).json({ error: "Invalid token" });
   }
 }

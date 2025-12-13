@@ -1,31 +1,41 @@
-import express from "express";
-import mongoose from "mongoose";
+// server.js
 import dotenv from "dotenv";
 dotenv.config();
-import cors from "cors";
-import cookieParser from "cookie-parser";
 
-import authRoutes from "./routes/auth.js";
+import express from "express";
+import cookieParser from "cookie-parser";
+import cors from "cors";
+
+import connectDB from "./config/db.js";
+
+
 
 const app = express();
-
-app.use(express.json());
+app.use(express.json({ limit: "5mb" }));
 app.use(cookieParser());
 
-app.use(
-  cors({
-    origin: "http://localhost:5173", // yahan apna frontend origin
-    credentials: true,
-  })
-);
+// CORS (allow client origin)
+app.use(cors({
+  origin: process.env.FRONTEND_ORIGIN || "http://localhost:5173",
+  credentials: true
+}));
 
-mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => console.log("MongoDB Connected"))
-  .catch((err) => console.log(err));
+await connectDB(process.env.MONGO_URL);
 
-app.use("/auth", authRoutes);
+// routes
+import authRoutes from "./routes/auth.js";
+import courseRoutes from "./routes/courses.js";
+import moduleRoutes from "./routes/modules.js";
+import topicRoutes from "./routes/topics.js";
+import userRoutes from "./routes/user.js";
+import adminRoutes from "./routes/admin.js";
 
-app.listen(process.env.PORT, () => {
-  console.log("Server running on port " + process.env.PORT);
-});
+app.use("/api/auth", authRoutes);
+app.use("/api/courses", courseRoutes);
+app.use("/api/modules", moduleRoutes);
+app.use("/api/topics", topicRoutes);
+app.use("/api/user", userRoutes);
+app.use("/api/admin", adminRoutes);
+
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`Server running on ${PORT}`));
