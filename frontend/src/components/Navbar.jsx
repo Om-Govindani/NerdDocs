@@ -7,7 +7,7 @@ function Navbar({ theme, setTheme }) {
   return (
     <div
       className="navbar fixed top-0 z-50 bg-blue-50 drop-shadow-3xl w-full h-16
-                 flex items-center justify-between px-6"
+                 flex items-center justify-between px-6 shadow-black/25 shadow-md"
       style={{ backdropFilter: "blur(8px)" }}
     >
       {/* Logo */}

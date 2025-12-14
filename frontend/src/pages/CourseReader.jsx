@@ -1,14 +1,13 @@
 import { useEffect, useState, useContext } from "react";
-import { useParams } from "react-router-dom";
+import { useParams ,useNavigate } from "react-router-dom";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import Navbar from "../components/Navbar";
 import ThemeContext from "../context/ThemeContext";
 
 export default function CourseReader() {
   const { courseId } = useParams();
-  console.log(courseId)
   const [theme, setTheme] = useContext(ThemeContext);
-
+  const navigate = useNavigate();
 
   const [showHint, setShowHint] = useState(false);
   const [modules, setModules] = useState([]);
@@ -22,7 +21,7 @@ export default function CourseReader() {
     async function fetchReader() {
       try {
         const res = await fetch(
-          `http://localhost:5000/api/reader/${courseId}`,
+          `https://nerddocs-backend.vercel.app/api/reader/${courseId}`,
           { credentials: "include" }
         );
 
@@ -31,7 +30,7 @@ export default function CourseReader() {
         }
 
         const data = await res.json();
-        console.log(data)
+        
         if (!Array.isArray(data.modules)) {
           console.error("Invalid reader response", data);
           return;
@@ -59,6 +58,9 @@ export default function CourseReader() {
       <div className="flex w-full mt-16">
         {/* ================= SIDEBAR ================= */}
         <div className="w-[280px] h-[calc(100vh-64px)] overflow-y-auto  p-4 bg-blue-50">
+          <p className="text-md mb-8 font-semibold h-8 flex items-center justify-center w-16 rounded-sm border-2 bg-blue-100  border-gray-200 cursor-pointer"
+            onClick={()=>navigate(`/course/${courseId}`)}
+          >Back</p>
           <h2 className="font-bold mb-4">Course Content</h2>
 
           {modules.map((mod) => (
@@ -109,8 +111,8 @@ export default function CourseReader() {
         {/* ================= CONTENT ================= */}
         <div className="flex-1 h-[calc(100vh-64px)] overflow-y-auto p-10">
           {!activeTopic ? (
-            <p className="text-gray-500">
-              Select a topic to start learning
+            <p className="text-gray-500 items-center ">
+              Loading Data
             </p>
           ) : (
             <>

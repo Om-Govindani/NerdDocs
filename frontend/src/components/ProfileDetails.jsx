@@ -23,7 +23,7 @@ export default function ProfileDetails() {
 
   async function handleLogout() {
     try {
-      await fetch("http://localhost:5000/api/auth/logout", {
+      await fetch("https://nerddocs-backend.vercel.app/api/auth/logout", {
         method: "POST",
         credentials: "include",
       });

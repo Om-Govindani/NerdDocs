@@ -10,7 +10,7 @@ export default function Sidebar() {
   useEffect(() => {
     async function fetchCategories() {
       try {
-        const res = await fetch("http://localhost:5000/api/courses/categories");
+        const res = await fetch("https://nerddocs-backend.vercel.app/api/courses/categories");
         if (!res.ok) {
           console.error("Failed to fetch categories");
           return;
@@ -50,7 +50,7 @@ export default function Sidebar() {
                 className={`cursor-pointer p-2 rounded-md transition 
                   ${
                     isActive
-                      ? " text-blue-600 font-semibold"
+                      ? " text-blue-600 font-semibold border-b-[0.5px] border-blue-600 rounded-none"
                       : "hover:bg-blue-100"
                   }
                 `}

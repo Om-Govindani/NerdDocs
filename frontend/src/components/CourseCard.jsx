@@ -35,7 +35,7 @@ export default function CourseCard({
   return (
     <div
       onClick={handleCardClick}
-      className="w-[330px] rounded-xl shadow-xl hover:transition-all hover:duration-300 hover:shadow-gray-900/50 border-[0.5px] border-gray-800/40 bg-white overflow-hidden cursor-pointer transition"
+      className="w-[330px] rounded-xl shadow-md shadow-gray-900/30 hover:shadow-xl hover:transition-all hover:duration-300 hover:shadow-gray-900/50 border-[0.5px] border-gray-800/40 bg-white overflow-hidden cursor-pointer transition"
     >
       <img
         src={thumbnail}

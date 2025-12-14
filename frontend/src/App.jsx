@@ -19,7 +19,7 @@ function App() {
   useEffect(() => {
     async function fetchUser() {
       try {
-        const res = await fetch("http://localhost:5000/api/auth/me", {
+        const res = await fetch("https://nerddocs-backend.vercel.app/api/auth/me", {
           method: "GET",
           credentials: "include", // IMPORTANT for cookies
         });
