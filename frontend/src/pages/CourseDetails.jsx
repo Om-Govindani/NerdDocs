@@ -16,13 +16,13 @@ export default function CourseDetails() {
     async function fetchCourse() {
       try {
         const metaRes = await fetch(
-          `http://localhost:5000/api/courses/${id}/meta`,
+          `https://nerddocs-backend.vercel.app/api/courses/${id}/meta`,
           { credentials: "include" }
         );
         const meta = await metaRes.json();
 
         const moduleRes = await fetch(
-          `http://localhost:5000/api/courses/${id}/outline`
+          `https://nerddocs-backend.vercel.app/api/courses/${id}/outline`
         );
         const moduleData = await moduleRes.json();
 
