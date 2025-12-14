@@ -45,7 +45,7 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/course/:id" element={<CourseDetails />} />
-              <Route path="/reader" element={<CourseReader />} />
+              <Route path="/reader/:courseId" element={<CourseReader />} />
             </Routes>
           </BrowserRouter>
         </AuthContext.Provider>

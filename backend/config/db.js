@@ -6,4 +6,5 @@ export default async function connectDB(uri) {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   });
+  console.log("MongoDB connected");
 }

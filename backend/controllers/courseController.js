@@ -1,6 +1,7 @@
 import CourseMeta from "../models/CourseMeta.js";
 import CourseModule from "../models/CourseModule.js";
 import UserCourses from "../models/UserCourses.js";
+import ModuleTopic from "../models/ModuleTopic.js";
 
 export const getCategories = async (req, res) => {
   try {
@@ -69,4 +70,31 @@ export const getCourseModules = async (req, res) => {
     const modules = await CourseModule.find({ course_id: courseId }).sort({ order: 1 }).select("-__v -_id");
     res.json({ modules });
   } catch (err) { res.status(500).json({ error: "Server error" }); }
+};
+
+// GET /api/courses/:courseId/outline
+export const getCourseOutline = async (req, res) => {
+  try {
+    const { courseId } = req.params;
+
+    const modules = await CourseModule
+      .find({ course_id: courseId })
+      .sort({ order: 1 })
+      .lean();
+
+    const moduleIds = modules.map(m => m.module_id);
+
+    const topics = await ModuleTopic
+      .find({ module_id: { $in: moduleIds } })
+      .sort({ order: 1 })
+      .lean();
+
+    const modulesWithTopics = modules.map(mod => ({
+      ...mod,
+      topics: topics.filter(t => t.module_id === mod.module_id)
+    }));
+    res.json({ modules: modulesWithTopics });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch outline" });
+  }
 };

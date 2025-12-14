@@ -29,13 +29,14 @@ import moduleRoutes from "./routes/modules.js";
 import topicRoutes from "./routes/topics.js";
 import userRoutes from "./routes/user.js";
 import adminRoutes from "./routes/admin.js";
-
+import readerRoutes from "./routes/reader.js"
 app.use("/api/auth", authRoutes);
 app.use("/api/courses", courseRoutes);
 app.use("/api/modules", moduleRoutes);
 app.use("/api/topics", topicRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/reader", readerRoutes)
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on ${PORT}`));
