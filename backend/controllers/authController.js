@@ -78,8 +78,9 @@ export const verifyOtp = async (req, res) => {
     const dev = process.env.NODE_ENV !== "production";
     const cookieOpts = (maxAge) => ({
       httpOnly: true,
-      secure: !dev,
-      sameSite: dev ? "lax" : "none",
+      secure: true,
+      sameSite: "none",
+      path: "/",
       maxAge
     });
 
@@ -101,7 +102,7 @@ export const refresh = async (req, res) => {
     const data = verifyRefresh(refreshToken);
     const newAccess = signAccess({ userId: data.userId });
     const dev = process.env.NODE_ENV !== "production";
-    res.cookie("accessToken", newAccess, { httpOnly: true, secure: !dev, sameSite: dev ? "lax" : "none", maxAge: 15*60*1000 })
+    res.cookie("accessToken", newAccess, { httpOnly: true, secure: true, sameSite: "none", path: "/", maxAge: 15*60*1000 })
        .json({ success: true });
   } catch (err) {
     console.error(err);
