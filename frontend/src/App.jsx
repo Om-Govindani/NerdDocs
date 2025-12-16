@@ -20,11 +20,13 @@ function App() {
     async function fetchUser() {
       try {
         const res = await fetch("https://nerddocs-backend.vercel.app/api/auth/me", {
+        // const res = await fetch("http://localhost:5000/api/auth/me", {
           method: "GET",
           credentials: "include", // IMPORTANT for cookies
         });
 
         const data = await res.json();
+        console.log(data);
         if (data.success && data.user) {
           setUser(data.user);
         }
