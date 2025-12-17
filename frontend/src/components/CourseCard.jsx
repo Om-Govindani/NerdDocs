@@ -1,14 +1,21 @@
+import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
+import AuthContext from "../context/AuthContext";
+
 
 export default function CourseCard({
   course_id,
   thumbnail,
   title,
   price,
+  details,
   disableNavigation = false,
-  buttonText = "View Details"
+  discountedPrice,
+  buttonText = "View Details",
+  onBuyNow
 }) {
   const navigate = useNavigate();
+  const [user, setUser] = useContext(AuthContext);
 
   const handleCardClick = () => {
     if (!course_id) return;
@@ -18,24 +25,29 @@ export default function CourseCard({
   };
 
   const handleButtonClick = (e) => {
-    e.stopPropagation(); // 🔥 MOST IMPORTANT LINE
+    e.stopPropagation();
 
-    if (!course_id) {
-      console.error("course_id missing in CourseCard");
+    if (!user) {
+      navigate("/profile");
       return;
+    }
+
+    if (!disableNavigation) {
+      navigate(`/course/${course_id}`);
     }
 
     if (disableNavigation) {
       navigate(`/reader/${course_id}`);
     } else {
-      navigate(`/course/${course_id}`);
+      onBuyNow?.();
     }
   };
+
 
   return (
     <div
       onClick={handleCardClick}
-      className="w-[330px] rounded-xl shadow-md shadow-gray-900/30 hover:shadow-xl hover:transition-all hover:duration-300 hover:shadow-gray-900/50 border-[0.5px] border-gray-800/40 bg-white overflow-hidden cursor-pointer transition"
+      className="w-[330px]  rounded-xl shadow-md shadow-gray-900/30 hover:shadow-xl hover:transition-all hover:duration-300 hover:shadow-gray-900/50 border-[0.5px] border-gray-800/40 bg-white overflow-hidden cursor-pointer transition"
     >
       <img
         src={thumbnail}
@@ -47,9 +59,11 @@ export default function CourseCard({
         <h2 className="text-lg font-sans leading-snug text-gray-800">
           {title}
         </h2>
+        <div className="text-sm text-gray-600 font-sans pt-2">{details}</div>
 
-        <div className="flex items-center mt-4">
-          <span className="text-md font-sans">₹{price}</span>
+        <div className="flex items-center mt-2 gap-x-1">
+          <span className="text-sm text-gray-800 line-through decoration-red-400 decoration-2 font-sans">₹{price}</span>
+          <span className="text-lg text-gray-800 font-sans">₹{discountedPrice}</span>
         </div>
 
         <button

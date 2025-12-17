@@ -3,6 +3,7 @@ import { useParams ,useNavigate } from "react-router-dom";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import Navbar from "../components/Navbar";
 import ThemeContext from "../context/ThemeContext";
+import Loader from "../components/Loader";
 
 export default function CourseReader() {
   const { courseId } = useParams();
@@ -13,6 +14,7 @@ export default function CourseReader() {
   const [modules, setModules] = useState([]);
   const [openModuleId, setOpenModuleId] = useState(null);
   const [activeTopic, setActiveTopic] = useState(null);
+  const [loading , setLoading] = useState(true);
 
   // ===============================
   // FETCH FULL COURSE READER DATA
@@ -20,6 +22,7 @@ export default function CourseReader() {
   useEffect(() => {
     async function fetchReader() {
       try {
+        setLoading(true)
         const res = await fetch(
           `https://nerddocs-backend.vercel.app/api/reader/${courseId}`,
           { credentials: "include" }
@@ -45,11 +48,15 @@ export default function CourseReader() {
         }
       } catch (err) {
         console.error("CourseReader error:", err);
+      } finally {
+        setLoading(false)
       }
     }
 
     fetchReader();
   }, [courseId]);
+  
+  if(loading || !modules) return <Loader />
 
   return (
     <div className="w-full h-screen flex bg-white">

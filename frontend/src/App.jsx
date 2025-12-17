@@ -15,28 +15,56 @@ function App() {
   const [catagory, setCatagory] = useState("Programming Language");
   const [user, setUser] = useState(null);
 
-  // On app load, check if user is already logged in (via cookies)
-  useEffect(() => {
-    async function fetchUser() {
-      try {
-        const res = await fetch("https://nerddocs-backend.vercel.app/api/auth/me", {
-        // const res = await fetch("http://localhost:5000/api/auth/me", {
-          method: "GET",
-          credentials: "include", // IMPORTANT for cookies
-        });
+  async function fetchMe() {
+    const res = await fetch("https://nerdocs-backend.vercel.app/api/auth/me", {
+      credentials: "include",
+    });
 
-        const data = await res.json();
-        console.log(data);
-        if (data.success && data.user) {
-          setUser(data.user);
-        }
-      } catch (err) {
-        console.log("Not logged in or /auth/me failed");
-      }
+    if (res.ok) {
+      return res.json();
     }
 
-    fetchUser();
+    if (res.status === 401) {
+      // try refresh
+      const refreshRes = await fetch(
+        "https://nerdocs-backend.vercel.app/api/auth/refresh",
+        { credentials: "include" }
+      );
+
+      if (!refreshRes.ok) {
+        throw new Error("Refresh failed");
+      }
+
+      // retry me
+      const retry = await fetch("https://nerdocs-backend.vercel.app/api/auth/me", {
+        credentials: "include",
+      });
+
+      if (!retry.ok) {
+        throw new Error("Retry failed");
+      }
+
+      return retry.json();
+    }
+
+    throw new Error("Auth failed");
+  }
+
+
+  // On app load, check if user is already logged in (via cookies)
+  useEffect(() => {
+    (async () => {
+      try {
+        const data = await fetchMe();
+        if (data.success) {
+          setUser(data.user);
+        }
+      } catch {
+        setUser(null);
+      }
+    })();
   }, []);
+
 
   return (
     <ThemeContext.Provider value={[theme, setTheme]}>

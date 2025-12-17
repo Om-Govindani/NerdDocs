@@ -18,9 +18,9 @@ function Navbar({ theme, setTheme }) {
         />
 
         <h1 className="text-2xl font-semibold">
-          <span className="text-blue-600">N</span>
+          <span className="text-blue-600/90">N</span>
           <span className={`${theme === "dark" ? "text-white" : "text-slate-900"}`}>erd</span>
-          <span className="text-blue-600">D</span>
+          <span className="text-blue-600/90">D</span>
           <span className={`${theme === "dark" ? "text-white" : "text-slate-900"}`}>ocs</span>
         </h1>
       </div>

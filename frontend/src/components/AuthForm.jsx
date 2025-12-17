@@ -59,6 +59,7 @@ function AuthForm() {
         credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          fullName,
           email,
           purpose: isSigningUp ? "signup" : "login",
           fullName: isSigningUp ? fullName : undefined, // SEND NAME ONLY FOR SIGNUP
