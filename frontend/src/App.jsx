@@ -16,7 +16,7 @@ function App() {
   const [user, setUser] = useState(null);
 
   async function fetchMe() {
-    const res = await fetch("https://nerdocs-backend.vercel.app/api/auth/me", {
+    const res = await fetch("https://nerddocs-backend.vercel.app/api/auth/me", {
       credentials: "include",
     });
 
@@ -27,7 +27,7 @@ function App() {
     if (res.status === 401) {
       // try refresh
       const refreshRes = await fetch(
-        "https://nerdocs-backend.vercel.app/api/auth/refresh",
+        "https://nerddocs-backend.vercel.app/api/auth/refresh",
         { credentials: "include" }
       );
 
@@ -36,7 +36,7 @@ function App() {
       }
 
       // retry me
-      const retry = await fetch("https://nerdocs-backend.vercel.app/api/auth/me", {
+      const retry = await fetch("https://nerddocs-backend.vercel.app/api/auth/me", {
         credentials: "include",
       });
 

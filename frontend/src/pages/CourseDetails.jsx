@@ -51,7 +51,7 @@ export default function CourseDetails() {
   async function handlePayment() {
     try {
       // 1. Create order
-      const res = await fetch("https://nerdocs-backend.vercel.app/api/order/create", {
+      const res = await fetch("https://nerddocs-backend.vercel.app/api/order/create", {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
@@ -89,7 +89,7 @@ export default function CourseDetails() {
         },
 
         handler: async function (response) {
-          const verifyRes = await fetch("https://nerdocs-backend.vercel.app/api/order/verify", {
+          const verifyRes = await fetch("https://nerddocs-backend.vercel.app/api/order/verify", {
             method: "POST",
             credentials: "include",
             headers: { "Content-Type": "application/json" },

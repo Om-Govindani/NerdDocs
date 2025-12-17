@@ -31,7 +31,7 @@ export default function ProfileDetails() {
       try {
         setLoading(true);
         const res = await fetch(
-          "https://nerdocs-backend.vercel.app/api/user/my-courses",
+          "https://nerddocs-backend.vercel.app/api/user/my-courses",
           { credentials: "include" }
         );
 
