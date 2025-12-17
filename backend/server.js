@@ -16,7 +16,7 @@ app.use(cookieParser());
 
 // CORS (allow client origin)
 app.use(cors({
-  origin: ["https://nerddocs.vercel.app" , "http://localhost:5173"],
+  origin: "https://nerddocs.vercel.app",
   credentials: true
 }));
 
