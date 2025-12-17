@@ -77,8 +77,8 @@ export const verifyOtp = async (req, res) => {
     const dev = process.env.NODE_ENV !== "production";
     const cookieOpts = (maxAge) => ({
       httpOnly: true,
-      secure: !dev,
-      sameSite: dev ? "lax" : "none",
+      secure: true,
+      sameSite:"none",
       maxAge
     });
 
@@ -100,7 +100,7 @@ export const refresh = async (req, res) => {
     const data = verifyRefresh(refreshToken);
     const newAccess = signAccess({ userId: data.userId });
     const dev = process.env.NODE_ENV !== "production";
-    res.cookie("accessToken", newAccess, { httpOnly: true, secure: !dev, sameSite: dev ? "lax" : "none", maxAge: 15*60*1000 })
+    res.cookie("accessToken", newAccess, { httpOnly: true, secure:true, sameSite:"none", maxAge: 15*60*1000 })
        .json({ success: true });
   } catch (err) {
     console.error(err);
@@ -121,7 +121,7 @@ export const me = async (req, res) => {
 
 export const logout = (req, res) => {
   const dev = process.env.NODE_ENV !== "production";
-  res.clearCookie("accessToken", { httpOnly: true, secure: !dev, sameSite: dev ? "lax" : "none" })
-     .clearCookie("refreshToken", { httpOnly: true, secure: !dev, sameSite: dev ? "lax" : "none" })
+  res.clearCookie("accessToken", { httpOnly: true, secure:true, sameSite:"none" })
+     .clearCookie("refreshToken", { httpOnly: true, secure:true, sameSite:"none" })
      .json({ success: true });
 };
