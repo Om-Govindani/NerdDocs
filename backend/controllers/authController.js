@@ -41,7 +41,7 @@ export const requestOtp = async (req, res) => {
 
 export const verifyOtp = async (req, res) => {
   try {
-    const { email, purpose, otp } = req.body;
+    const { fullName , email, purpose, otp } = req.body;
     if (!email || !otp) return res.status(400).json({ error: "Missing fields" });
 
     const record = await Otp.findOne({ email, purpose, used: false }).sort({ createdAt: -1 });
@@ -59,8 +59,7 @@ export const verifyOtp = async (req, res) => {
     if (purpose === "signup" && !user) {
       user = await User.create({
         user_id: `U${Date.now()}`,
-        firstName: "",
-        lastName: "",
+        fullName: fullName,
         emailEncrypted: encryptEmail(email),
         emailHash: crypto.createHash("sha256").update(email).digest("hex"),
         isEmailVerified: true
@@ -78,9 +77,8 @@ export const verifyOtp = async (req, res) => {
     const dev = process.env.NODE_ENV !== "production";
     const cookieOpts = (maxAge) => ({
       httpOnly: true,
-      secure: true,
-      sameSite: "none",
-      path: "/",
+      secure: !dev,
+      sameSite: dev ? "lax" : "none",
       maxAge
     });
 
@@ -102,7 +100,7 @@ export const refresh = async (req, res) => {
     const data = verifyRefresh(refreshToken);
     const newAccess = signAccess({ userId: data.userId });
     const dev = process.env.NODE_ENV !== "production";
-    res.cookie("accessToken", newAccess, { httpOnly: true, secure: true, sameSite: "none", path: "/", maxAge: 15*60*1000 })
+    res.cookie("accessToken", newAccess, { httpOnly: true, secure: !dev, sameSite: dev ? "lax" : "none", maxAge: 15*60*1000 })
        .json({ success: true });
   } catch (err) {
     console.error(err);
