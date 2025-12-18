@@ -1,6 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import CourseCard from "./CourseCard";
 import CatagoryContext from "../context/CatagoryContext";
+import Loader from "./Loader";
 
 export default function Catalogue({setLoading}) {
   const [catagory] = useContext(CatagoryContext);
@@ -38,6 +39,8 @@ export default function Catalogue({setLoading}) {
     console.log(courses)
     fetchCatalogue()
   }, [catagory]);
+
+  if(courses.length === 0) return <Loader />
 
   return (
     <div className="w-4/5 h-full overflow-y-auto px-6 py-6">
