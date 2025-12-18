@@ -1,6 +1,7 @@
 import { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import CatagoryContext from "../context/CatagoryContext";
+import Loader from "./Loader";
 
 export default function Sidebar() {
   const [catagory, setCatagory] = useContext(CatagoryContext);
@@ -40,7 +41,7 @@ export default function Sidebar() {
     <div className="w-64 bg-blue-50 text-gray-800 h-screen px-5 pt-8 border-r border-gray-200">
       <ul className="flex-col mt-55 space-y-4">
         {catList.length === 0 ? (
-          <p className="text-gray-500">Loading...</p>
+          <Loader />
         ) : (
           catList.map((option, index) => {
             const isActive = catagory === option.name;
