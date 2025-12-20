@@ -16,7 +16,7 @@ export default function Catalogue({setLoading}) {
     async function fetchCatalogue() {
       try{
         setLoading(true);
-        fetch(`https://nerddocs-backend.vercel.app/api/courses/by-category/${encoded}`)
+        fetch(`${import.meta.env.VITE_BACKEND_URL}/api/courses/by-category/${encoded}`)
           .then(res => {
             if (!res.ok) throw new Error("Category not found");
             return res.json();

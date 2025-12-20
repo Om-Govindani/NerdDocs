@@ -12,7 +12,7 @@ export default function Sidebar() {
     async function fetchCategories() {
       try {
         // const res = await fetch("https://nerddocs-backend.vercel.app/api/courses/categories");
-        const res = await fetch("https://nerddocs-backend.vercel.app/api/courses/categories");
+        const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/courses/categories`);
         if (!res.ok) {
           console.error("Failed to fetch categories");
           return;

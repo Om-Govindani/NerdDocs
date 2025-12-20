@@ -54,7 +54,7 @@ function AuthForm() {
     setIsLoading(true);
 
     try {
-      const res = await fetch("https://nerddocs-backend.vercel.app/api/auth/request-otp", {
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/request-otp`, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
@@ -84,7 +84,7 @@ function AuthForm() {
     if (!otp || otp.length !== 6) return setError("Enter the 6-digit OTP");
 
     try {
-      const res = await fetch("https://nerddocs-backend.vercel.app/api/auth/verify-otp", {
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/verify-otp`, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },

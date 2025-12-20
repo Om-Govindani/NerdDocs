@@ -16,47 +16,72 @@ export default function CourseReader() {
   const [activeTopic, setActiveTopic] = useState(null);
   const [loading , setLoading] = useState(true);
 
-  // ===============================
-  // FETCH FULL COURSE READER DATA
-  // ===============================
+  const [allowed, setAllowed] = useState(null); // null = checking
+
   useEffect(() => {
-    async function fetchReader() {
+    async function checkAccess() {
       try {
-        setLoading(true)
+        
         const res = await fetch(
-          `https://nerddocs-backend.vercel.app/api/reader/${courseId}`,
+          `${import.meta.env.VITE_BACKEND_URL}/api/user/course/${courseId}/status`,
           { credentials: "include" }
         );
-
         if (!res.ok) {
-          throw new Error("Reader API failed");
-        }
-
-        const data = await res.json();
-        
-        if (!Array.isArray(data.modules)) {
-          console.error("Invalid reader response", data);
+          navigate(`/course/${courseId}`);
           return;
         }
 
-        setModules(data.modules);
+        const data = await res.json();
 
-        // Auto-open first module & topic
-        if (data.modules.length && data.modules[0].topics.length) {
-          setOpenModuleId(data.modules[0].module_id);
-          setActiveTopic(data.modules[0].topics[0]);
+        if (!data.purchased) {
+          navigate(`/course/${courseId}`);
+          return;
         }
+
+        setAllowed(true);
       } catch (err) {
-        console.error("CourseReader error:", err);
-      } finally {
-        setLoading(false)
+        console.error(err);
+        navigate(`/course/${courseId}`);
       }
     }
 
-    fetchReader();
+    checkAccess();
   }, [courseId]);
-  
-  if(loading || !modules) return <Loader />
+
+  // ===============================
+  // FETCH FULL COURSE READER DATA
+  // ===============================
+  // FETCH READER DATA (depends on allowed)
+useEffect(() => {
+  if (!allowed) return;
+
+  async function fetchReader() {
+    try {
+      setLoading(true);
+
+      const res = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/api/reader/${courseId}`,
+        { credentials: "include" }
+      );
+
+      const data = await res.json();
+      setModules(data.modules || []);
+
+      if (data.modules?.length && data.modules[0].topics?.length) {
+        setOpenModuleId(data.modules[0].module_id);
+        setActiveTopic(data.modules[0].topics[0]);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  fetchReader();
+}, [allowed, courseId]);
+
+  if(!allowed || loading || !modules ) return <Loader />
 
   return (
     <div className="w-full h-screen flex bg-white">

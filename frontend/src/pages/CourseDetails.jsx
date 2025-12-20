@@ -23,13 +23,13 @@ export default function CourseDetails() {
         setLoading(true);
 
         const metaRes = await fetch(
-          `https://nerddocs-backend.vercel.app/api/courses/${id}/meta`,
+          `${import.meta.env.VITE_BACKEND_URL}/api/courses/${id}/meta`,
           { credentials: "include" }
         );
         const meta = await metaRes.json();
 
         const moduleRes = await fetch(
-          `https://nerddocs-backend.vercel.app/api/courses/${id}/outline`
+          `${import.meta.env.VITE_BACKEND_URL}/api/courses/${id}/outline`
         );
         const moduleData = await moduleRes.json();
 
@@ -51,7 +51,7 @@ export default function CourseDetails() {
   async function handlePayment() {
     try {
       // 1. Create order
-      const res = await fetch("https://nerddocs-backend.vercel.app/api/order/create", {
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/order/create`, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
@@ -89,7 +89,7 @@ export default function CourseDetails() {
         },
 
         handler: async function (response) {
-          const verifyRes = await fetch("https://nerddocs-backend.vercel.app/api/order/verify", {
+          const verifyRes = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/order/verify`, {
             method: "POST",
             credentials: "include",
             headers: { "Content-Type": "application/json" },

@@ -31,7 +31,7 @@ export default function ProfileDetails() {
       try {
         setLoading(true);
         const res = await fetch(
-          "https://nerddocs-backend.vercel.app/api/user/my-courses",
+          `${import.meta.env.VITE_BACKEND_URL}/api/user/my-courses`,
           { credentials: "include" }
         );
 
@@ -55,7 +55,7 @@ export default function ProfileDetails() {
   // ===============================
   async function handleLogout() {
     try {
-      await fetch("https://nerdocs-backend.vercel.app/api/auth/logout", {
+      await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/logout`, {
         method: "POST",
         credentials: "include",
       });

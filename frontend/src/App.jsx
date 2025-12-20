@@ -16,7 +16,7 @@ function App() {
   const [user, setUser] = useState(null);
 
   async function fetchMe() {
-    const res = await fetch("https://nerddocs-backend.vercel.app/api/auth/me", {
+    const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/me`, {
       credentials: "include",
     });
 
@@ -27,7 +27,7 @@ function App() {
     if (res.status === 401) {
       // try refresh
       const refreshRes = await fetch(
-        "https://nerddocs-backend.vercel.app/api/auth/refresh",
+        `${import.meta.env.VITE_BACKEND_URL}/api/auth/refresh`,
         { credentials: "include" }
       );
 
@@ -36,7 +36,7 @@ function App() {
       }
 
       // retry me
-      const retry = await fetch("https://nerddocs-backend.vercel.app/api/auth/me", {
+      const retry = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/me`, {
         credentials: "include",
       });
 
@@ -76,6 +76,7 @@ function App() {
               <Route path="/profile" element={<Profile />} />
               <Route path="/course/:id" element={<CourseDetails />} />
               <Route path="/reader/:courseId" element={<CourseReader />} />
+              <Route path="*" element={<Home />} />
             </Routes>
           </BrowserRouter>
         </AuthContext.Provider>
