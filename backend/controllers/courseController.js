@@ -38,8 +38,6 @@ export const getCoursesByCategory = async (req, res) => {
       category: { $regex: new RegExp("^" + category + "$", "i") }
     });
 
-    console.log(courses)
-
     if (!courses.length) {
       return res.status(404).json({ error: "No courses found for this category" });
     }

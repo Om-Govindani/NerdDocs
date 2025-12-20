@@ -7,6 +7,15 @@ dotenv.config();
 import CourseMeta from "../models/CourseMeta.js";
 import Order from "../models/Order.js";
 import UserCourses from "../models/UserCourses.js";
+import User from "../models/User.js";
+import { decryptEmail } from "../utils/emailCrypto.js";
+
+
+
+import { generateInvoiceHTML } from "../utils/invoiceTemplate.js";
+import { generateInvoicePDF } from "../utils/generatePdf.js";
+import { sendInvoiceEmail } from "../utils/sendInvoiceEmail.js";
+
 
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
@@ -76,18 +85,25 @@ export const createOrder = async (req, res) => {
 export const verifyPayment = async (req, res) => {
   try {
     const userId = String(req.user.userId);
-    console.log(process.env.RAZORPAY_KEY_ID);
-    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } =
-      req.body;
+
+    const {
+      razorpay_order_id,
+      razorpay_payment_id,
+      razorpay_signature,
+    } = req.body;
 
     if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
       return res.status(400).json({ error: "Invalid payment payload" });
     }
 
     const order = await Order.findOne({ razorpay_order_id });
-    if (!order) return res.status(404).json({ error: "Order not found" });
+    if (!order) {
+      return res.status(404).json({ error: "Order not found" });
+    }
 
-    // Signature verification
+    // -------------------------------
+    // 1️⃣ VERIFY SIGNATURE
+    // -------------------------------
     const generatedSignature = crypto
       .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
       .update(`${razorpay_order_id}|${razorpay_payment_id}`)
@@ -99,24 +115,79 @@ export const verifyPayment = async (req, res) => {
       return res.status(400).json({ error: "Payment verification failed" });
     }
 
-    // Mark order paid
-    order.razorpay_payment_id = razorpay_payment_id;
-    order.status = "PAID";
-    await order.save();
+    // -------------------------------
+    // 2️⃣ MARK ORDER PAID (IDEMPOTENT)
+    // -------------------------------
+    if (order.status !== "PAID") {
+      order.status = "PAID";
+      order.razorpay_payment_id = razorpay_payment_id;
+      await order.save();
+    }
 
-    // Grant course access
-    await UserCourses.create({
+    // -------------------------------
+    // 3️⃣ GRANT COURSE ACCESS (SAFE)
+    // -------------------------------
+    const alreadyGranted = await UserCourses.findOne({
       user_id: userId,
       course_id: order.course_id,
-      completed: false,
     });
 
-    res.json({
+    if (!alreadyGranted) {
+      await UserCourses.create({
+        user_id: userId,
+        course_id: order.course_id,
+        completed: false,
+      });
+    }
+
+    // -------------------------------
+    // 4️⃣ SEND INVOICE (NON-CRITICAL)
+    // -------------------------------
+    try {
+      const user = await User.findById(userId);
+      const course = await CourseMeta.findOne({
+        course_id: order.course_id,
+      });
+
+      if (user && course) {
+        const toEmail = decryptEmail(user.emailEncrypted);
+
+        if (!toEmail) {
+          throw new Error("Decrypted email missing");
+        }
+
+        const invoiceHTML = generateInvoiceHTML({
+          invoiceNo: `ND-${Date.now()}`,
+          user,
+          toEmail,
+          course,
+          order,
+        });
+
+        const pdfBuffer = await generateInvoicePDF(invoiceHTML);
+
+        await sendInvoiceEmail({
+          to: toEmail,          // ✅ NOW CORRECT
+          pdfBuffer,
+          course,
+          order,
+        });
+      }
+    } catch (invoiceErr) {
+      console.error("Invoice generation/email failed:", invoiceErr);
+    }
+
+
+    // -------------------------------
+    // 5️⃣ FINAL RESPONSE
+    // -------------------------------
+    return res.json({
       success: true,
       message: "Payment verified, course unlocked",
     });
+
   } catch (err) {
     console.error("Verify payment error:", err);
-    res.status(500).json({ error: "Payment verification failed" });
+    return res.status(500).json({ error: "Payment verification failed" });
   }
 };
