@@ -1,4 +1,9 @@
-export function generateInvoiceHTML({ invoiceNo, user, toEmail, course, order }) {
+export function generateInvoiceHTML({
+  invoiceNo,
+  toEmail,
+  course,
+  order,
+}) {
   return `
 <!DOCTYPE html>
 <html lang="en">
@@ -7,53 +12,42 @@ export function generateInvoiceHTML({ invoiceNo, user, toEmail, course, order })
   <title>Invoice</title>
 
   <style>
-    @page {
-      size: A4;
-      margin: 24mm;
-    }
-
     body {
       margin: 0;
+      padding: 24px;
       font-family: Arial, Helvetica, sans-serif;
       font-size: 13px;
       color: #2b2b2b;
+      background: #ffffff;
     }
 
-    .page {
-      min-height: calc(297mm - 48mm);
-      display: flex;
-      flex-direction: column;
+    .invoice {
+      max-width: 720px;
+      margin: 0 auto;
     }
 
     /* BRAND */
     .brand {
-      font-size: 28px;
+      font-size: 26px;
       font-weight: 600;
-      letter-spacing: 0.3px;
+      margin-bottom: 4px;
     }
-
-    .brand .blue {
-      color: #2563eb;
-    }
-
-    .brand .dark {
-      color: #0f172a;
-    }
+    .brand .blue { color: #2563eb; }
+    .brand .dark { color: #0f172a; }
 
     .pan {
-      margin-top: 4px;
       font-size: 11px;
       color: #6b7280;
+      margin-bottom: 20px;
     }
 
     /* HEADER */
     .header {
       display: flex;
       justify-content: space-between;
-      align-items: flex-start;
-      padding-bottom: 16px;
       border-bottom: 1px solid #e5e7eb;
-      margin-bottom: 28px;
+      padding-bottom: 12px;
+      margin-bottom: 20px;
     }
 
     .invoice-meta {
@@ -65,12 +59,12 @@ export function generateInvoiceHTML({ invoiceNo, user, toEmail, course, order })
     .invoice-meta strong {
       display: block;
       font-size: 14px;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
     }
 
     /* SECTIONS */
     .section {
-      margin-bottom: 28px;
+      margin-bottom: 18px;
     }
 
     .section-title {
@@ -78,20 +72,21 @@ export function generateInvoiceHTML({ invoiceNo, user, toEmail, course, order })
       font-weight: 600;
       color: #6b7280;
       text-transform: uppercase;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
     }
 
     .two-col {
       display: flex;
       justify-content: space-between;
-      gap: 40px;
+      gap: 32px;
+      font-size: 13px;
     }
 
     /* TABLE */
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 12px;
+      margin-top: 8px;
     }
 
     thead th {
@@ -99,25 +94,25 @@ export function generateInvoiceHTML({ invoiceNo, user, toEmail, course, order })
       font-size: 12px;
       font-weight: 600;
       color: #374151;
-      padding: 10px;
-      border-bottom: 1px solid #e5e7eb;
+      padding: 8px;
       text-align: left;
+      border-bottom: 1px solid #e5e7eb;
     }
 
     tbody td {
-      padding: 12px 10px;
+      padding: 10px 8px;
       border-bottom: 1px solid #e5e7eb;
     }
 
     /* TOTAL */
     .total-box {
-      margin-top: 24px;
+      margin-top: 16px;
       display: flex;
       justify-content: flex-end;
     }
 
     .total {
-      width: 260px;
+      width: 240px;
       font-size: 13px;
       color: #374151;
     }
@@ -125,31 +120,31 @@ export function generateInvoiceHTML({ invoiceNo, user, toEmail, course, order })
     .total-row {
       display: flex;
       justify-content: space-between;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
     }
 
     .total-row.final {
       font-size: 15px;
       font-weight: 600;
       border-top: 1px solid #d1d5db;
-      padding-top: 8px;
-      margin-top: 10px;
+      padding-top: 6px;
+      margin-top: 6px;
     }
 
     /* FOOTER */
     .footer {
-      margin-top: auto;
-      padding-top: 14px;
+      margin-top: 20px;
+      padding-top: 10px;
       border-top: 1px solid #e5e7eb;
       font-size: 11px;
       color: #6b7280;
-      line-height: 1.6;
+      line-height: 1.5;
     }
   </style>
 </head>
 
 <body>
-  <div class="page">
+  <div class="invoice">
 
     <!-- HEADER -->
     <div class="header">
@@ -157,7 +152,6 @@ export function generateInvoiceHTML({ invoiceNo, user, toEmail, course, order })
         <div class="brand">
           <span class="blue">N</span><span class="dark">erd</span><span class="blue">D</span><span class="dark">ocs</span>
         </div>
-
         <div class="pan">PAN: DYOPG6466H</div>
       </div>
 
@@ -177,9 +171,9 @@ export function generateInvoiceHTML({ invoiceNo, user, toEmail, course, order })
         </div>
 
         <div>
-          <div class="section-title">Payment Details</div>
-          Method: Razorpay<br />
-          Transaction ID: ${order.razorpay_payment_id}
+          <div class="section-title">Payment</div>
+          Razorpay<br />
+          Txn ID: ${order.razorpay_payment_id}
         </div>
       </div>
     </div>
@@ -222,9 +216,9 @@ export function generateInvoiceHTML({ invoiceNo, user, toEmail, course, order })
 
     <!-- FOOTER -->
     <div class="footer">
-      This is a system-generated invoice for the purchase of digital course
-      content on the NerdDocs platform. GST is not applicable.<br />
-      Payment processed securely via Razorpay.
+      • This is a system-generated invoice for the purchase of digital course
+      content on the NerdDocs platform. <br />• GST is not applicable.<br />
+      • Payment processed securely via Razorpay.
     </div>
 
   </div>

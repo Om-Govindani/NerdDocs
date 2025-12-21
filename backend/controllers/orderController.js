@@ -141,24 +141,26 @@ export const verifyPayment = async (req, res) => {
     }
 
     // -------------------------------
-    // 4️⃣ SEND INVOICE (NON-CRITICAL)
+    // 4️⃣ SEND INVOICE (ASYNC / FIRE-AND-FORGET)
     // -------------------------------
-    try {
-      const user = await User.findById(userId);
-      const course = await CourseMeta.findOne({
-        course_id: order.course_id,
-      });
 
-      if (user && course) {
+    // ⛔ DO NOT await this block
+    setImmediate(async () => {
+      try {
+        const user = await User.findById(userId);
+        const course = await CourseMeta.findOne({
+          course_id: order.course_id,
+        });
+
+        if (!user || !course) return;
+
         const toEmail = decryptEmail(user.emailEncrypted);
-
         if (!toEmail) {
           throw new Error("Decrypted email missing");
         }
 
         const invoiceHTML = generateInvoiceHTML({
           invoiceNo: `ND-${Date.now()}`,
-          user,
           toEmail,
           course,
           order,
@@ -167,24 +169,26 @@ export const verifyPayment = async (req, res) => {
         const pdfBuffer = await generateInvoicePDF(invoiceHTML);
 
         await sendInvoiceEmail({
-          to: toEmail,          // ✅ NOW CORRECT
+          to: toEmail,
           pdfBuffer,
           course,
           order,
         });
-      }
-    } catch (invoiceErr) {
-      console.error("Invoice generation/email failed:", invoiceErr);
-    }
 
+        console.log("Invoice email sent successfully");
+      } catch (err) {
+        console.error("Async invoice/email failed:", err);
+      }
+    });
 
     // -------------------------------
-    // 5️⃣ FINAL RESPONSE
+    // 5️⃣ FINAL RESPONSE (FAST)
     // -------------------------------
     return res.json({
       success: true,
       message: "Payment verified, course unlocked",
     });
+
 
   } catch (err) {
     console.error("Verify payment error:", err);
