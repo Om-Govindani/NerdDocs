@@ -12,10 +12,12 @@ export default function CourseCard({
   disableNavigation = false,
   discountedPrice,
   buttonText = "View Details",
-  onBuyNow
+  onBuyNow,
+  showInvoiceButton = false,     // 👈 NEW
+  onDownloadInvoice                  // 👈 NEW
 }) {
   const navigate = useNavigate();
-  const [user, setUser] = useContext(AuthContext);
+  const [user] = useContext(AuthContext);
 
   const handleCardClick = () => {
     if (!course_id) return;
@@ -32,10 +34,6 @@ export default function CourseCard({
       return;
     }
 
-    if (!disableNavigation) {
-      navigate(`/course/${course_id}`);
-    }
-
     if (disableNavigation) {
       navigate(`/reader/${course_id}`);
     } else {
@@ -43,36 +41,45 @@ export default function CourseCard({
     }
   };
 
+  const handleInvoiceClick = async (e) => {
+    e.stopPropagation();
+    onDownloadInvoice(course_id);
+  };
 
   return (
     <div
       onClick={handleCardClick}
-      className="w-[330px]  rounded-xl shadow-md shadow-gray-900/30 hover:shadow-xl hover:transition-all hover:duration-300 hover:shadow-gray-900/50 border-[0.5px] border-gray-800/40 bg-white overflow-hidden cursor-pointer transition"
+      className="w-[330px] rounded-xl shadow-md border bg-white overflow-hidden cursor-pointer"
     >
-      <img
-        src={thumbnail}
-        alt={title}
-        className="w-full h-55 object-cover"
-      />
+      <img src={thumbnail} alt={title} className="w-full h-55 object-cover" />
 
       <div className="p-4">
-        <h2 className="text-lg font-sans leading-snug text-gray-800">
-          {title}
-        </h2>
-        <div className="text-sm text-gray-600 font-sans pt-2">{details}</div>
+        <h2 className="text-lg font-sans text-gray-800">{title}</h2>
+        <div className="text-sm text-gray-600 pt-2">{details}</div>
 
         <div className="flex items-center mt-2 gap-x-1">
-          <span className="text-sm text-gray-800 line-through decoration-red-400 decoration-2 font-sans">₹{price}</span>
-          <span className="text-lg text-gray-800 font-sans">₹{discountedPrice}</span>
+          <span className="line-through text-sm">₹{price}</span>
+          <span className="text-lg">₹{discountedPrice}</span>
         </div>
 
         <button
           onClick={handleButtonClick}
-          className="w-full mt-4 bg-blue-500 hover:bg-blue-600/90 text-white font-sans py-2 rounded-3xl transition"
+          className="w-full mt-4 bg-blue-500 text-white py-2 rounded-3xl"
         >
           {buttonText}
         </button>
+
+        {/* 👇 INVOICE BUTTON */}
+        {showInvoiceButton && (
+          <button
+            onClick={handleInvoiceClick}
+            className="w-full mt-2 border border-blue-500 text-blue-600 py-2 rounded-3xl hover:bg-blue-50 cursor-pointer"
+          >
+            Download Invoice
+          </button>
+        )}
       </div>
     </div>
   );
 }
+

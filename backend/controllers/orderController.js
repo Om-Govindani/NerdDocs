@@ -53,7 +53,6 @@ export const createOrder = async (req, res) => {
       currency: "INR",
       receipt: `rcpt_${course_id}_${Date.now()}`,
     });
-    console.log(razorpayOrder);
 
     // Save order in DB
     const order = await Order.create({
@@ -63,8 +62,7 @@ export const createOrder = async (req, res) => {
       amount,
       status: "CREATED",
     });
-    console.log("_____");
-    console.log(order);
+    
     res.json({
       success: true,
       orderId: razorpayOrder.id,
@@ -72,7 +70,7 @@ export const createOrder = async (req, res) => {
       courseTitle: course.title,
       thumbnailUrl: course.thumbnailUrl,
     });
-    console.log(res);
+    
   } catch (err) {
     console.error("Create order error:", err);
     res.status(500).json({ error: "Order creation failed" });
@@ -140,46 +138,46 @@ export const verifyPayment = async (req, res) => {
       });
     }
 
-    // -------------------------------
-    // 4️⃣ SEND INVOICE (ASYNC / FIRE-AND-FORGET)
-    // -------------------------------
+    // // -------------------------------
+    // // 4️⃣ SEND INVOICE (ASYNC / FIRE-AND-FORGET)
+    // // -------------------------------
 
-    // ⛔ DO NOT await this block
-    setImmediate(async () => {
-      try {
-        const user = await User.findById(userId);
-        const course = await CourseMeta.findOne({
-          course_id: order.course_id,
-        });
+    // // ⛔ DO NOT await this block
+    // setImmediate(async () => {
+    //   try {
+    //     const user = await User.findById(userId);
+    //     const course = await CourseMeta.findOne({
+    //       course_id: order.course_id,
+    //     });
 
-        if (!user || !course) return;
+    //     if (!user || !course) return;
 
-        const toEmail = decryptEmail(user.emailEncrypted);
-        if (!toEmail) {
-          throw new Error("Decrypted email missing");
-        }
+    //     const toEmail = decryptEmail(user.emailEncrypted);
+    //     if (!toEmail) {
+    //       throw new Error("Decrypted email missing");
+    //     }
 
-        const invoiceHTML = generateInvoiceHTML({
-          invoiceNo: `ND-${Date.now()}`,
-          toEmail,
-          course,
-          order,
-        });
+    //     const invoiceHTML = generateInvoiceHTML({
+    //       invoiceNo: `ND-${Date.now()}`,
+    //       toEmail,
+    //       course,
+    //       order,
+    //     });
 
-        const pdfBuffer = await generateInvoicePDF(invoiceHTML);
+    //     const pdfBuffer = await generateInvoicePDF(invoiceHTML);
 
-        await sendInvoiceEmail({
-          to: toEmail,
-          pdfBuffer,
-          course,
-          order,
-        });
+    //     await sendInvoiceEmail({
+    //       to: toEmail,
+    //       pdfBuffer,
+    //       course,
+    //       order,
+    //     });
 
-        console.log("Invoice email sent successfully");
-      } catch (err) {
-        console.error("Async invoice/email failed:", err);
-      }
-    });
+    //     console.log("Invoice email sent successfully");
+    //   } catch (err) {
+    //     console.error("Async invoice/email failed:", err);
+    //   }
+    // });
 
     // -------------------------------
     // 5️⃣ FINAL RESPONSE (FAST)

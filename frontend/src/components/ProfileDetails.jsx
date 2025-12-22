@@ -5,6 +5,9 @@ import AuthContext from "../context/AuthContext";
 import ThemeContext from "../context/ThemeContext";
 import CourseCard from "../components/CourseCard";
 import Loader from "./Loader";
+import { generateInvoiceHTML } from "../utils/invoiceTemplate";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 
 export default function ProfileDetails() {
   const [user, setUser] = useContext(AuthContext);
@@ -49,6 +52,67 @@ export default function ProfileDetails() {
 
     fetchMyCourses();
   }, []);
+
+  async function handleDownloadInvoice(courseId) {
+    try {
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/invoice/data/${courseId}`, {
+        method: "GET",
+        credentials: "include",
+      });
+      const data = await res.json();
+  
+      const invoiceData = {
+        invoiceNo: data.invoiceNo,
+        toEmail: data.email,
+        course: { title: data.course.title },
+        order: {
+          razorpay_payment_id: data.order.razorpay_payment_id,
+          amount: data.order.amount,
+        },
+      };
+  
+      const html = generateInvoiceHTML(invoiceData);
+  
+      // --- FIX START ---
+      const container = document.createElement("div");
+      container.style.position = "absolute";
+      container.style.left = "-9999px"; // Screen se bahar fenk do
+      container.style.top = "0";
+      container.style.width = "800px"; // Fixed width match with CSS
+      container.innerHTML = html;
+      document.body.appendChild(container);
+  
+      // Image/Fonts load hone ka thoda wait
+      await new Promise((r) => setTimeout(r, 500));
+  
+      const canvas = await html2canvas(container, {
+        scale: 1, // High quality ke liye 3 best hai
+        useCORS: true,
+        logging: false,
+        backgroundColor: "#ffffff",
+        width: 800, // Explicitly tell width
+      });
+  
+      const imgData = canvas.toDataURL("image/png");
+      
+      // PDF Aspect Ratio Fix
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const imgProps = pdf.getImageProperties(imgData);
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+  
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      pdf.save(`Invoice_${invoiceData.invoiceNo}.pdf`);
+  
+      document.body.removeChild(container);
+      // --- FIX END ---
+  
+    } catch (err) {
+      console.error(err);
+      alert("Invoice download failed");
+    }
+  }
+
 
   // ===============================
   // LOGOUT
@@ -104,6 +168,8 @@ export default function ProfileDetails() {
               details={course.description}
               disableNavigation
               buttonText="Go To Course"
+              showInvoiceButton                       // 👈 always true here
+              onDownloadInvoice={handleDownloadInvoice}
             />
           ))}
         </div>
